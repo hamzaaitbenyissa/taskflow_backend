@@ -54,4 +54,4 @@ jobs:
       - name: Running tests with pytest.
         run: |
           set -o pipefail
-          pytest --cov=./ --cov-report=xml:coverage.xml --cov-report=term-missing
+          pytest 
