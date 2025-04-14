@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party apps
+    "rest_framework",
+    'corsheaders',
+    # apps
+    "tasks.apps.TasksConfig"
+
 ]
 
 MIDDLEWARE = [
@@ -120,4 +126,3 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-INSTALLED_APPS += ['rest_framework', 'tasks']
