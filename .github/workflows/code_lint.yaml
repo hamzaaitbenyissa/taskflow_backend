@@ -1,0 +1,27 @@
+name: Lint And Format Checker.
+
+on:
+  pull_request:
+    branches: [ "*" ]
+  push:
+    branches: [ "main" ]
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.12" ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Checking code formatting.
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check
+      - name: Running linter.
+        uses: astral-sh/ruff-action@v3
+

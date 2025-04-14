@@ -1,0 +1,5 @@
+mypy
+django-stubs
+mypy-extensions
+pytest-stub
+djangorestframework-stubs
