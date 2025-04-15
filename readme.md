@@ -18,6 +18,12 @@ python manage.py migrate
 ```
 
 4. The API will be available at: http://localhost:8080/api/v1/
+5. Connect to the frontend at: https://taskflow-frontend-crsa.vercel.app/tasks
+
+## Demo
+[screen-capture (2).webm](https://github.com/user-attachments/assets/610374a4-48cf-40a0-899e-fb34f4fd8ca6)
+
+
 
 ## Django Project Structure
 ```
