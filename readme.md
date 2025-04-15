@@ -1,26 +1,55 @@
 # Task Flow Backend Design
 
+## Local Development Setup
+
+1. Start the services:
+```bash
+docker compose up -d
+```
+
+2. Enter the web container:
+```bash
+docker compose exec app bash
+```
+
+3. Run database migrations (first time setup):
+```bash
+python manage.py migrate
+```
+
+4. The API will be available at: http://localhost:8080/api/v1/
+
 ## Django Project Structure
 ```
 task_manager/
-├── manage.py
-├── task_manager/
+├── manage.py                 # Django management CLI
+├── requirements.txt          # Python dependencies
+├── task_manager/             # Main Django project
 │   ├── __init__.py
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-├── tasks/
-│   ├── migrations/
+│   ├── settings.py           # Project settings
+│   ├── urls.py               # Main URL routing
+│   ├── asgi.py               # ASGI configuration
+│   └── wsgi.py               # WSGI configuration
+├── tasks/                    # Tasks application
+│   ├── migrations/           # Database migrations
 │   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── models.py
-│   ├── serializers.py
-│   ├── tests.py
-│   ├── urls.py
-│   └── views.py
-└── requirements.txt
+│   ├── admin.py              # Admin interface configuration
+│   ├── apps.py               # App configuration
+│   ├── models.py             # Database models
+│   ├── serializers.py        # API serializers
+│   ├── tests/                # Test suite
+│   │   ├── __init__.py
+│   │   ├── test_models.py    # Model tests
+│   │   ├── test_serializers.py # Serializer tests
+│   │   └── test_views.py     # View tests
+│   ├── urls.py               # App URL routing
+│   └── views.py              # API views
+├── .github/workflows/        # CI/CD pipelines
+│   ├── code_lint.yaml        # Linting workflow
+│   ├── pytest.yaml           # Testing workflow
+│   └── typing.yaml           # Type checking workflow
+├── Dockerfile                # Docker configuration
+└── docker-compose.yml        # Docker Compose setup
 ```
 
 ## Data Model
@@ -239,34 +268,6 @@ All error responses follow this format:
 }
 ```
 
-### Implementation
-To implement this standardized error handling, we'll create a custom exception handler:
+## TODO
 
-```python
-# task_manager/exceptions.py
-from rest_framework.views import exception_handler
-from rest_framework import status
-from rest_framework.response import Response
-
-def custom_exception_handler(exc, context):
-    response = exception_handler(exc, context)
-    
-    if response is not None:
-        error_data = {
-            'error': {
-                'code': exc.get_codes() if hasattr(exc, 'get_codes') else 'error',
-                'message': str(exc),
-                'details': response.data if isinstance(response.data, dict) else None
-            }
-        }
-        response.data = error_data
-    
-    return response
-```
-
-Then register it in settings.py:
-```python
-REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'task_manager.exceptions.custom_exception_handler'
-}
-```
+- [ ] Implement custom error handling with standardized error responses
