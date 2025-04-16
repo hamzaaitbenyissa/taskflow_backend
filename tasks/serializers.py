@@ -5,6 +5,8 @@ from tasks import models as tasks_models
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    """Serializer for the Task model."""
+
     class Meta:
         model = tasks_models.Task
         fields = "__all__"
