@@ -277,3 +277,7 @@ All error responses follow this format:
 ## TODO
 
 - [ ] Implement custom error handling with standardized error responses
+- [ ] Add pagination to the task list endpoint
+- [ ] Add search and filter functionality for tasks
+- [ ] Implement authentication and authorization
+- [ ] Support Import/Export of tasks

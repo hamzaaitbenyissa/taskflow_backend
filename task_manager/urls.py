@@ -20,10 +20,10 @@ from django.urls import path
 from django.urls import include
 from rest_framework import routers as rest_routers
 
-from tasks.views import TaskViewSet
+from tasks import views as tasks_views
 
 router = rest_routers.DefaultRouter(trailing_slash=False)
-router.register(r"tasks", TaskViewSet)
+router.register(r"tasks", tasks_views.TaskViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(router.urls)),
