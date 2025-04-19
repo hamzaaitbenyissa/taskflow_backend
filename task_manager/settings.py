@@ -38,12 +38,23 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # apps
+    "tasks.apps.TasksConfig",
     # Third-party apps
     "rest_framework",
     "corsheaders",
-    # apps
-    "tasks.apps.TasksConfig",
+    "drf_spectacular",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Task Manager API",
+    "DESCRIPTION": "API documentation for the Task Manager project",
+    "VERSION": "1.0.0",
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

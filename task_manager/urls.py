@@ -16,8 +16,9 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
 from django.urls import include
+from django.urls import path
+from drf_spectacular import views as spectacular_views
 from rest_framework import routers as rest_routers
 
 from tasks import views as tasks_views
@@ -27,4 +28,17 @@ router.register(r"tasks", tasks_views.TaskViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(router.urls)),
+    path(
+        "api/v1/schema/", spectacular_views.SpectacularAPIView.as_view(), name="schema"
+    ),
+    path(
+        "api/v1/docs/swagger/",
+        spectacular_views.SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/v1/docs/redoc/",
+        spectacular_views.SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ]
