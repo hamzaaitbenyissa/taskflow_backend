@@ -14,9 +14,12 @@ class APIErrorPayload:
     error_code: str
     message: str
     http_status_code: int
-    metadata: dict | None = None
+    metadata: dict | list | None = None
 
     def to_dict(self):
+        """Convert the dataclass to a dictionary."""
+        if isinstance(self.metadata, list):
+            self.metadata = {"errors": self.metadata}
         return {
             "error_code": self.error_code,
             "message": self.message,
@@ -25,27 +28,46 @@ class APIErrorPayload:
         }
 
 
-class BaseAPIException(drf_exceptions.APIException):
-    status_code = status.HTTP_400_BAD_REQUEST
-    default_code = "bad_request"
+class Error(Exception):
+    """Base class for all exceptions in the API."""
+
+    pass
+
+
+class BaseAPIError(Error):
+    http_status_code: int = status.HTTP_400_BAD_REQUEST
+    default_detail = "An error occurred."
+    error_code: str
+    message: str
+    metadata: dict | list | None = None
 
     def __init__(
         self,
-        *,
-        error_code: str,
-        message: str,
-        http_status_code: int = 400,
-        metadata: dict | None = None,
+        error_code="bad_request",
+        message="Something went wrong.",
+        http_status_code=status.HTTP_400_BAD_REQUEST,
+        metadata=None,
     ):
-        self.detail = APIErrorPayload(
-            error_code=error_code,
-            message=message,
-            http_status_code=http_status_code,
-            metadata=metadata,
+        self.error_code = error_code
+        self.message = message or self.default_detail
+        self.http_status_code = http_status_code
+        self.metadata = metadata or None
+
+    @property
+    def detail(self):
+        """Return the error details."""
+        return APIErrorPayload(
+            error_code=self.error_code,
+            message=self.message,
+            http_status_code=self.http_status_code,
+            metadata=self.metadata,
         ).to_dict()
 
 
 def handle_exception(exc: Any, context: Any) -> drf_response.Response | None:
+    if isinstance(exc, BaseAPIError):
+        return drf_response.Response(data=exc.detail, status=exc.http_status_code)
+
     if isinstance(exc, drf_exceptions.ValidationError):
         return drf_response.Response(
             data=APIErrorPayload(
@@ -56,9 +78,6 @@ def handle_exception(exc: Any, context: Any) -> drf_response.Response | None:
             ).to_dict(),
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-    if isinstance(exc, BaseAPIException):
-        return drf_response.Response(exc.detail, status=exc.detail["http_status_code"])
 
     # Fallback to DRF default handler
     response = drf_exception_handler(exc, context)

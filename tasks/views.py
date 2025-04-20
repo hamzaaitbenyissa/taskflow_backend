@@ -1,4 +1,5 @@
 """This module contains the view sets for the Task API."""
+
 from django import http as django_http
 from rest_framework import viewsets
 
@@ -21,4 +22,4 @@ class TaskViewSet(viewsets.ModelViewSet):
         try:
             return super().get_object()
         except django_http.Http404:
-            raise tasks_exceptions.TaskNotFoundException(task_id=self.kwargs.get("pk"))
+            raise tasks_exceptions.TaskNotFoundException(task_id=self.kwargs["pk"])

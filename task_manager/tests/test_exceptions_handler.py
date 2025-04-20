@@ -1,6 +1,5 @@
 """Unit tests for exceptions_handler.py."""
 
-
 from rest_framework import exceptions as rest_framework_exceptions
 from rest_framework import status
 
@@ -10,7 +9,7 @@ from tasks import exceptions as tasks_exceptions
 
 def testHandleException_whenValidationError_thenReturns400():
     """Test that handle_exception returns 400 for ValidationError."""
-    exception = exceptions_handler.BaseAPIException(
+    exception = exceptions_handler.BaseAPIError(
         error_code="validation_error",
         message="Given data is not valid.",
         http_status_code=status.HTTP_400_BAD_REQUEST,
@@ -28,8 +27,8 @@ def testHandleException_whenValidationError_thenReturns400():
     }
 
 
-def testHandleException_whenBaseAPIException_returnsCustomResponse():
-    """Test that handle_exception returns custom response for BaseAPIException."""
+def testHandleException_whenBaseAPIError_returnsCustomResponse():
+    """Test that handle_exception returns custom response for BaseAPIError."""
     exception = tasks_exceptions.TaskNotFoundException(task_id=1)
 
     response = exceptions_handler.handle_exception(exception, None)
@@ -43,8 +42,8 @@ def testHandleException_whenBaseAPIException_returnsCustomResponse():
     }
 
 
-def testHandleException_whenNonBaseAPIException_returnsCorrectResponse():
-    """Test that handle_exception returns correct response for non-custom BaseAPIException."""
+def testHandleException_whenNonBaseAPIError_returnsCorrectResponse():
+    """Test that handle_exception returns correct response for non-custom BaseAPIError."""
     exception = rest_framework_exceptions.APIException(
         detail="Custom error message.",
         code="custom_error",
