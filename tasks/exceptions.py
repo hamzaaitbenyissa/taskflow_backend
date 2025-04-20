@@ -8,7 +8,7 @@ class TaskNotFoundException(exceptions_handler.BaseAPIException):
 
     def __init__(self, task_id: int):
         super().__init__(
-            code="task_not_found",
+            error_code="task_not_found",
             message=f"Task with id={task_id} not found.",
-            http_status=status.HTTP_404_NOT_FOUND,
+            http_status_code=status.HTTP_404_NOT_FOUND,
         )

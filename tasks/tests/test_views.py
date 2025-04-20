@@ -79,9 +79,9 @@ def testTaskViewSetCreate_whenTitleIsMissing_returnsBadRequest(client) -> None:
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert json.loads(response.content) == {
-        "code": "validation_error",
-        "errors": {"title": ["This field is required."]},
-        "http_status": 400,
+        "error_code": "validation_error",
+        "metadata": {"title": ["This field is required."]},
+        "http_status_code": 400,
         "message": "Given data is not valid.",
     }
 
@@ -100,22 +100,24 @@ def testTaskViewSetCreate_whenDescriptionIsMissing_returnsBadRequest(client) -> 
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert json.loads(response.content) == {
-        "code": "validation_error",
-        "errors": {"description": ["This field is required."]},
-        "http_status": 400,
+        "error_code": "validation_error",
+        "metadata": {"description": ["This field is required."]},
+        "http_status_code": 400,
         "message": "Given data is not valid.",
     }
     assert task_models.Task.objects.count() == 0
 
 
 @pytest.mark.django_db
-def testGetTaskById_whenTaskExists_returnsTask(mocker, client) -> None:
+def testGetTaskById_whenTaskExists_returnsTask(client, mocker) -> None:
     mocker.patch(
         "django.utils.timezone.now", return_value="2025-04-20T10:19:36.142755Z"
     )
     task = task_models.Task.objects.create(
         title="Task 1", description="Description 1", completed=False
     )
+    task_id = task.id
+
     response = client.get(
         reverse("task-detail", args=[task.id]),
         content_type="application/json",
@@ -126,7 +128,7 @@ def testGetTaskById_whenTaskExists_returnsTask(mocker, client) -> None:
         "completed": False,
         "created_at": "2025-04-20T10:19:36.142755Z",
         "description": "Description 1",
-        "id": 1,
+        "id": task_id,
         "title": "Task 1",
         "updated_at": "2025-04-20T10:19:36.142755Z",
     }
@@ -141,10 +143,10 @@ def testGetTaskById_whenTaskDoesNotExist_returnsTaskNotFound(client) -> None:
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content) == {
-        "code": "task_not_found",
-        "http_status": 404,
+        "error_code": "task_not_found",
+        "http_status_code": 404,
         "message": "Task with id=999 not found.",
-        "errors": None,
+        "metadata": None,
     }
 
 
@@ -164,10 +166,10 @@ def testUpdateTask_whenTaskDoesNotExist_returnsTaskNotFound(client) -> None:
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content) == {
-        "code": "task_not_found",
-        "http_status": 404,
+        "error_code": "task_not_found",
+        "http_status_code": 404,
         "message": "Task with id=999 not found.",
-        "errors": None,
+        "metadata": None,
     }
 
 
@@ -180,8 +182,8 @@ def testDeleteTask_whenTaskDoesNotExist_returnsTaskNotFound(client) -> None:
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content) == {
-        "code": "task_not_found",
-        "http_status": 404,
+        "error_code": "task_not_found",
+        "http_status_code": 404,
         "message": "Task with id=999 not found.",
-        "errors": None,
+        "metadata": None,
     }
