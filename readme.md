@@ -233,12 +233,11 @@ urlpatterns = [
 All error responses follow this format:
 ```json
 {
-    "error": {
-        "code": "error_code",
-        "message": "Human-readable error message",
-        "details": {
-            // Optional field for additional error details
-        }
+    "error_code": "error_code",  // A unique code identifying the error type
+    "message": "Human-readable error message",  // A descriptive message for the error
+    "http_status_code": "HTTP status code, e.g., 400",  // The HTTP status code associated with the error
+    "metadata": {  // Optional field for additional error details
+        // Key-value pairs providing more context about the error
     }
 }
 ```
@@ -247,36 +246,33 @@ All error responses follow this format:
 ```json
 // 400 Bad Request (Validation Error)
 {
-    "error": {
-        "code": "validation_error",
-        "message": "Invalid input data",
-        "details": {
-            "title": ["This field is required."],
-            "description": ["This field is required."]
-        }
+    "error_code": "validation_error",
+    "message": "Given data is not valid.",
+    "http_status_code": 400,
+    "metadata": {
+        "title": ["This field is required."],
+        "description": ["This field is required."]
     }
 }
 
 // 404 Not Found
 {
-    "error": {
-        "code": "not_found",
-        "message": "The requested task was not found"
-    }
+    "error_code": "task_not_found",
+    "message": "Task with id=1 not found.",
+    "http_status_code": 404
 }
 
 // 500 Internal Server Error
 {
-    "error": {
-        "code": "server_error",
-        "message": "An unexpected error occurred. Please try again later."
-    }
+    "error_code": "unhandled_error",
+    "message": "Unknown error occurred.",
+    "http_status_code": 500
 }
 ```
 
 ## TODO
 
-- [ ] Implement custom error handling with standardized error responses
+- [x] Implement custom error handling with standardized error responses (2025-04-20)
 - [ ] Add pagination to the task list endpoint
 - [ ] Add search and filter functionality for tasks
 - [ ] Implement authentication and authorization
