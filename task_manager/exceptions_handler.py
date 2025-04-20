@@ -11,6 +11,14 @@ from rest_framework.views import exception_handler as drf_exception_handler
 
 @dataclasses.dataclass
 class APIErrorPayload:
+    """The payload for API error responses.
+    Attributes
+        error_code (str): The error code.
+        message (str): The error message.
+        http_status_code (int): The HTTP status code.
+        metadata (dict | list | None): Additional metadata about the error.
+    """
+
     error_code: str
     message: str
     http_status_code: int
@@ -35,6 +43,16 @@ class Error(Exception):
 
 
 class BaseAPIError(Error):
+    """This the base class for all API errors.
+
+    Attributes:
+        http_status_code (int): The HTTP status code.
+        default_detail (str): The default error message.
+        error_code (str): The error code.
+        message (str): The error message.
+        metadata (dict | list | None): Additional metadata about the error.
+    """
+
     http_status_code: int = status.HTTP_400_BAD_REQUEST
     default_detail = "An error occurred."
     error_code: str
@@ -65,6 +83,14 @@ class BaseAPIError(Error):
 
 
 def handle_exception(exc: Any, context: Any) -> drf_response.Response | None:
+    """Handle exceptions raised in the API.
+    Args:
+        exc (Exception): The exception raised.
+        context (dict): The context in which the exception was raised.
+
+    Returns:
+        drf_response.Response | None: The response to be returned.
+    """
     if isinstance(exc, BaseAPIError):
         return drf_response.Response(data=exc.detail, status=exc.http_status_code)
 

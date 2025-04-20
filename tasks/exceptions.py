@@ -4,6 +4,7 @@ from task_manager import exceptions_handler
 
 
 class TaskNotFoundException(exceptions_handler.BaseAPIError):
+    """Exception raised when a task is not found."""
     def __init__(self, task_id: int):
         super().__init__(
             error_code="task_not_found",
