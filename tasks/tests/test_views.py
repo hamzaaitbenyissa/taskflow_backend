@@ -187,3 +187,137 @@ def testDeleteTask_whenTaskDoesNotExist_returnsTaskNotFound(client) -> None:
         "message": "Task with id=999 not found.",
         "metadata": None,
     }
+
+
+@pytest.mark.django_db
+def testGetTask_whenNoTasksExist_returnsEmptyList(client) -> None:
+    response = client.get(
+        reverse("task-list"),
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert json.loads(response.content) == {
+        "currentPage": 1,
+        "pageSize": 10,
+        "tasks": [],
+        "totalPages": 1,
+    }
+
+
+@pytest.mark.django_db
+def testGetTasks_whenTasksExist_returnsTaskList(client, mocker) -> None:
+    mocker.patch(
+        "django.utils.timezone.now", return_value="2025-04-20T10:19:36.142755Z"
+    )
+    task1 = task_models.Task.objects.create(
+        title="Task 1", description="Description 1", completed=False
+    )
+    task2 = task_models.Task.objects.create(
+        title="Task 2", description="Description 2", completed=True
+    )
+
+    response = client.get(
+        reverse("task-list"),
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert json.loads(response.content) == {
+        "currentPage": 1,
+        "pageSize": 10,
+        "tasks": [
+            {
+                "completed": False,
+                "created_at": "2025-04-20T10:19:36.142755Z",
+                "description": "Description 1",
+                "id": task1.id,
+                "title": "Task 1",
+                "updated_at": "2025-04-20T10:19:36.142755Z",
+            },
+            {
+                "completed": True,
+                "created_at": "2025-04-20T10:19:36.142755Z",
+                "description": "Description 2",
+                "id": task2.id,
+                "title": "Task 2",
+                "updated_at": "2025-04-20T10:19:36.142755Z",
+            },
+        ],
+        "totalPages": 1,
+    }
+
+
+@pytest.mark.django_db
+def testGetTasks_whenSearchQueryProvided_returnsFilteredTasks(client, mocker) -> None:
+    mocker.patch(
+        "django.utils.timezone.now", return_value="2025-04-20T10:19:36.142755Z"
+    )
+    task1 = task_models.Task.objects.create(
+        title="This task should appear in the search",
+        description="any",
+        completed=False,
+    )
+    for i in range(2, 11):
+        task_models.Task.objects.create(
+            title=f"Task {i}", description=f"Description {i}", completed=False
+        )
+
+    response = client.get(
+        reverse("task-list") + "?search=appear",
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert json.loads(response.content) == {
+        "currentPage": 1,
+        "pageSize": 10,
+        "tasks": [
+            {
+                "completed": False,
+                "created_at": "2025-04-20T10:19:36.142755Z",
+                "description": task1.description,
+                "id": task1.id,
+                "title": task1.title,
+                "updated_at": "2025-04-20T10:19:36.142755Z",
+            }
+        ],
+        "totalPages": 1,
+    }
+
+
+@pytest.mark.django_db
+def testGetTasks_whenCompletedFilterRequested_returnsOnlyCompletedTasks(
+    client, mocker
+) -> None:
+    mocker.patch(
+        "django.utils.timezone.now", return_value="2025-04-20T10:19:36.142755Z"
+    )
+    task1 = task_models.Task.objects.create(
+        title="Task 1", description="Description 1", completed=True
+    )
+    task_models.Task.objects.create(
+        title="Task 2", description="Description 2", completed=False
+    )
+
+    response = client.get(
+        reverse("task-list") + "?completed=true",
+        content_type="application/json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert json.loads(response.content) == {
+        "currentPage": 1,
+        "pageSize": 10,
+        "tasks": [
+            {
+                "completed": True,
+                "created_at": "2025-04-20T10:19:36.142755Z",
+                "description": task1.description,
+                "id": task1.id,
+                "title": task1.title,
+                "updated_at": "2025-04-20T10:19:36.142755Z",
+            }
+        ],
+        "totalPages": 1,
+    }
